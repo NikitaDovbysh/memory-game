@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Game</title>
+</head>
+<body>
+    <h1>Memory game</h1>
+
+    <table id="container" border="1" cellpadding="30" cellspacing="5">
+    </table>
+</body>
+<script>
+    function shuffle(array) {
+        let currentIndex = array.length;
+
+        // While there remain elements to shuffle...
+        while (currentIndex != 0) {
+
+            // Pick a remaining element...
+            let randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+
+            // And swap it with the current element.
+            [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+        }
+    }
+
+    const catCell = { cardName: "cat", flipped: false }
+    const dogCell = { cardName: "dog", flipped: false }
+    const snakeCell = { cardName: "snake", flipped: false }
+    const hampsterCell = { cardName: "hampster", flipped: false }
+    const lizardCell = { cardName: "lizard", flipped: false }
+    const fishCell = { cardName: "fish", flipped: false }
+
+    // ========================================================================
+    // GAME STATE BEGIN
+    // ========================================================================
+    let gameList = [
+        {...catCell},
+        {...catCell},
+        {...fishCell},
+        {...fishCell},
+        {...dogCell},
+        {...dogCell},
+        {...lizardCell},
+        {...lizardCell},
+        {...hampsterCell},
+        {...hampsterCell},
+        {...snakeCell},
+        {...snakeCell}
+    ]
+
+    shuffle(gameList)
+
+    let game = [
+        [gameList[0], gameList[1], gameList[2]],
+        [gameList[3], gameList[4], gameList[5]],
+        [gameList[6], gameList[7], gameList[8]], 
+        [gameList[9], gameList[10], gameList[11]]
+    ]
+
+    let x = 0
+    let y = 0
+
+    let previousCell = null
+
+    let moves = 0
+
+    // TODO: After every game randomize the board
+
+    // ========================================================================
+    // GAME STATE END
+    // ========================================================================
+
+    function getImagePath(cardName) {
+        if (cardName === 'card') {
+            return "./card.jpeg";
+        }
+
+        if (cardName === 'cat') {
+            return "./cat.jpeg";
+        }
+
+        if (cardName === 'dog') {
+            return "./dog.jpeg";
+        }
+
+        if (cardName === 'snake') {
+            return "./snake.jpeg";
+        }
+
+        if (cardName === 'hampster') {
+            return "./hampster.jpeg";
+        }
+
+        if (cardName === 'lizard') {
+            return "./lizard.jpeg";
+        }
+
+        if (cardName === 'fish') {
+            return "./fish.jpeg";
+        }
+    }
+    
+    function renderGame(game) {
+        const table = document.getElementById("container")
+        table.innerHTML = ""
+
+        game.forEach((row, rowNumber) => {
+            const tr = document.createElement("tr")
+            table.appendChild(tr)
+
+            row.forEach((cell, colNumber) => {
+                const td = document.createElement("td")
+                tr.appendChild(td)
+
+
+                if (rowNumber === y && colNumber === x) {
+                    td.style.backgroundColor = 'blue';
+                }
+
+                const image = document.createElement("img")
+
+                if (cell.flipped) {
+                    image.src = getImagePath(cell.cardName)
+                }
+                else {
+                    image.src = getImagePath("card")
+                }
+
+                image.style = "width: 80px"
+
+                td.appendChild(image)
+            })
+        });
+    }
+
+    function isEverythingFlipped(game) {
+        let allFlipped = true
+
+        game.forEach(row => {
+            row.forEach(cell => {
+                if (!cell.flipped) {
+                    allFlipped = false
+                }
+            })
+        })
+
+        return allFlipped
+    }
+
+    document.addEventListener('keydown', event => {
+        if (event.code === "ArrowRight") {
+            x++
+        }
+
+        if (event.code === "ArrowLeft") {
+            x--
+        }
+
+        if (event.code === "ArrowUp") {
+            y--
+        } 
+
+        if (event.code === "ArrowDown") {
+            y++
+        }
+
+        if (event.code === "Space") {
+            const currentRow = game[y]
+            const currentCell = currentRow[x]
+
+            if (!currentCell.flipped) {
+                currentCell.flipped = true
+                moves++
+
+                if (previousCell && currentCell.cardName === previousCell.cardName) {
+                    previousCell = null
+                }
+                else {
+                    if (previousCell) {
+                        previousCell.flipped = false
+                    }
+
+                    previousCell = currentCell
+                }
+
+                // Check if everything is flipped!
+                if (isEverythingFlipped(game)) {
+                    alert(`You won in ${moves} moves!`)
+                }
+            }
+        }
+
+        if (x > 2) {
+            x = 2
+        } 
+
+        if (y > 3) {
+            y = 3
+        }
+
+        if (x < 0) {
+            x = 0
+        }
+
+        if (y < 0) {
+            y = 0
+        }
+
+        renderGame(game)
+    })
+
+    renderGame(game)
+</script>
+</html
+
+
